@@ -55,12 +55,12 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@master
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_PASSWORD }}
+      # - name: Login to DockerHub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: quay.io
+      #     username: ${{ secrets.QUAY_USERNAME }}
+      #     password: ${{ secrets.QUAY_PASSWORD }}
       - name: Build  🔧
         env:
           FLAVOR: ${{ matrix.flavor }}
@@ -68,19 +68,19 @@ jobs:
         run: |
           ./earthly.sh +all-arm --MODEL=$MODEL --FLAVOR=$FLAVOR --K3S_VERSION=${{ matrix.k3s_version }}
       - name: Push  🔧
-        if: startsWith(github.ref, 'refs/tags/')
+        # if: startsWith(github.ref, 'refs/tags/')
         run: |
-          echo $(cat build/IMAGE)
-          docker push $(cat build/IMAGE)
-      - name: Sign image
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          COSIGN_YES: true
-        run: |
-          export IMAGE=$(cat build/IMAGE)
-          cosign sign $(docker images "$IMAGE" --format  "{{.Digest}}")
+          echo docker push $(cat build/IMAGE)
+          # docker push $(cat build/IMAGE)
+      # - name: Sign image
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   env:
+      #     COSIGN_YES: true
+      #   run: |
+      #     export IMAGE=$(cat build/IMAGE)
+      #     cosign sign $(docker images "$IMAGE" --format  "{{.Digest}}")
       - name: Upload Image
-        if: startsWith(github.ref, 'refs/tags/')
+        # if: startsWith(github.ref, 'refs/tags/')
         run: |
           curl https://luet.io/install.sh | sudo sh
           IMG=$(cat build/IMAGE).img
