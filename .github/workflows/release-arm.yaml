@@ -3,6 +3,8 @@ name: 'Build arm images'
 
 on:
   push:
+    branches:
+      - 770-push-arm-images-to-own-repo
     tags:
       - '*'
 
@@ -68,6 +70,7 @@ jobs:
       - name: Push  🔧
         if: startsWith(github.ref, 'refs/tags/')
         run: |
+          echo $(cat build/IMAGE)
           docker push $(cat build/IMAGE)
       - name: Sign image
         if: startsWith(github.ref, 'refs/tags/')
@@ -84,5 +87,6 @@ jobs:
           sudo tar cvf build.tar build
           sudo luet util pack $IMG build.tar image.tar
           sudo -E docker load -i image.tar
+          echo quay.io/kairos/kairos-${{ matrix.flavor }}-img:${{ matrix.k3s_version }}
           sudo -E docker push quay.io/kairos/kairos-${{ matrix.flavor }}-img:${{ matrix.k3s_version }}.img
           sudo rm -rf build/IMAGE build/VERSION
